@@ -19,14 +19,14 @@ namespace HW2___Arrays
             {
                 D[i] = Double.Parse(splt[i]);
             }
-            int[] Converted = doubleToInt(ref D);
+            int[] Converted = doubleToInt(D);
             for (int i = 0; i < N; ++i)
             {
                 Console.Write($"{Converted[i]} ");
             }
                         
         }
-        static int [] doubleToInt (ref double[] Array)
+        static int [] doubleToInt (double[] Array)
         {
             int N = Array.Length;
             int[] Converted = new int[N];

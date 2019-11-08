@@ -23,10 +23,10 @@ namespace HW2___Arrays
                 }                
             }
 
-            PrintUpperTriangle(ref Array);
+            PrintUpperTriangle(Array);
  
         }
-        static void PrintUpperTriangle (ref int[,] Array)
+        static void PrintUpperTriangle (int[,] Array)
         {
             int N = Array.GetLength(0);
             for (int i = 0; i < N; i++)

@@ -20,14 +20,14 @@ namespace HW2___Arrays
                 Array[i] = int.Parse(splt[i]);
             }
             int position = int.Parse(Console.ReadLine());
-            int[] NewArray = deleteElement(ref Array, position);
+            int[] NewArray = deleteElement(Array, position);
                        
             for (int i = 0; i < NewArray.Length; ++i)
             {
                 Console.Write($"{NewArray[i]} ");
             }
         }
-        static int[] deleteElement(ref int[] Array, int position)
+        static int[] deleteElement(int[] Array, int position)
         {
             int N = Array.Length;
             int[] NewArray = new int[N - 1];
