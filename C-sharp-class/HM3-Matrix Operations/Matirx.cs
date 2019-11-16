@@ -84,18 +84,17 @@ namespace HM3_Matrix_Operations
             }
         }
 
-        public Matrix(int rows, int columns, int[] elems)
+        public Matrix(int rows, int columns, double[,] elems)
         {
             this.Rows = rows;
             this.Columns = columns;
             this.Matr = new double[this.Rows, this.Columns];
-            int el = 0;
+            
             for (int i = 0; i < this.Rows; ++i)
             {
                 for (int j = 0; j < columns; ++j)
                 {
-                    Matr[i, j] = elems[el];
-                    ++el;
+                    Matr[i, j] = elems[i, j];                    
                 }
             }
         } 
@@ -221,6 +220,189 @@ namespace HM3_Matrix_Operations
                 return false;              
             }            
         }
+
+        static public Matrix [] MultiplyByScalar(Matrix [] M_Array, double scalar)
+        {
+            Matrix[] NewMArray = new Matrix[M_Array.Length];
+            for (int i = 0; i < M_Array.Length; ++i)
+            {
+                NewMArray[i] = new Matrix(M_Array[i].Rows, M_Array[i].Columns, 0);
+                for (int m = 0; m < M_Array[i].Rows; ++m)
+                {
+                    for (int n = 0; n < M_Array[i].Columns; ++n)
+                    {
+                        NewMArray[i].Matr[m, n] = M_Array[i].Matr[m, n] * scalar;
+                    }
+                }
+            }
+            return NewMArray;
+        }
+
+        static public Matrix MultiplyByScalar(Matrix Matr, double scalar)
+        {
+            Matrix NewMArray = new Matrix(Matr.Rows, Matr.Columns, 0);
+
+            for (int i = 0; i < Matr.Rows; ++i)
+            {
+                for (int j = 0; j < Matr.Columns; ++j)
+                {
+                    NewMArray.Matr[i, j] = Math.Round(Matr.Matr[i, j] * scalar, 2);
+                }
+            }
+            
+            return NewMArray;
+        }
+        static public Matrix Inverse (Matrix matrix)
+        {
+            if (matrix.Rows == matrix.Columns)
+            {
+                double determinant = Math.Round(Matrix.Determinant(matrix.Matr), 2);
+                if (determinant != 0)
+                {
+                    Matrix adjugate = new Matrix(matrix.Rows, matrix.Columns, 0);
+                    double[,] matrForAdjugate = MatrixofMinors(matrix);
+                    int sign1 = 1;
+                    for (int i = 0; i < matrix.Rows; ++i)
+                    {
+                        int sign2 = sign1;
+                        for (int j = 0; j < matrix.Columns; ++j)
+                        {                            
+                            adjugate.Matr[i, j] = matrForAdjugate[i, j] * sign2;
+                            sign2 *= -1;
+                        }
+                        sign1 *= -1;
+                    }
+                    Matrix.Transpose(ref adjugate);
+                    return Matrix.MultiplyByScalar(adjugate, Math.Round(1 / determinant, 2));
+                }
+                Matrix M1 = new Matrix(0, 0, 0);
+                return M1;
+            }
+            Matrix M2 = new Matrix(0, 0, 0);
+            return M2;
+        }
+
+        static public double Determinant(double[,] matrix)
+        {
+            int lenghti = matrix.GetLength(0);
+            if (lenghti == 2)
+            {
+                return matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0];
+            }
+            else
+            {
+                int lenghtj = matrix.GetLength(1);
+                Matrix[] NewArray = new Matrix[lenghtj];
+                for (int j = 0; j < lenghtj; ++j)
+                {
+                    NewArray[j] = new Matrix(lenghti - 1, lenghtj - 1, 0);
+                    for (int i = 1; i < lenghti; ++i)
+                    {
+                        for (int c1 = 0, c2 = 0; c2 < lenghtj; )
+                        {
+                            if (c2 == j)
+                            {
+                                ++c2;
+                                continue;
+                            }
+                            else
+                            {
+                                NewArray[j].Matr[i - 1, c1] = matrix[i, c2];
+                                ++c1;
+                                ++c2;
+                            }
+                        }
+                    }
+
+                }
+                //double[] determs = new double[lenghtj];
+                double Det = 0;
+                int sign = 1;
+                for (int j = 0; j < lenghtj; ++j)
+                {
+                    Det += sign * matrix[0, j] * Determinant(NewArray[j].Matr);
+                    sign *= -1;
+                }
+                return Det;
+            }
+            
+        }
+
+        static private double[,] MatrixofMinors(Matrix matrix)
+        {
+            int lenghti = matrix.Rows;
+            int lenghtj = matrix.Columns;
+            double[,] matr = new double[lenghti, lenghtj];
+            for (int i = 0; i < lenghti; ++i)
+            {
+                for (int j = 0; j < lenghtj; ++j)
+                {
+                    double[,] newArray = new double[lenghti - 1, lenghtj - 1];
+                    for (int r1 = 0, r2 = 0; r2 < lenghti; )
+                    {
+                        if (r2 == i)
+                        {
+                            ++r2;
+                            continue;
+                        }
+
+                        for (int c1 = 0, c2 = 0; c2 < lenghtj;)
+                        {
+                            if (c2 == j)
+                            {
+                                ++c2;                                
+                                continue;
+                            }                            
+                            else
+                            {
+                                newArray[r1, c1] = matrix.Matr[r2, c2];
+                                ++c1;
+                                ++c2;
+                            }
+                        }
+                        ++r1;
+                        ++r2;
+                    }
+
+                    matr[i, j] = Math.Round(Determinant(newArray), 2);
+                }
+            }
+            return matr;
+        }
+
+        static public void Transpose(ref Matrix matrix)
+        {
+            int lenghti = matrix.Rows;
+            int lenghtj = matrix.Columns;
+            Matrix newMatr = new Matrix(lenghtj, lenghti);
+            for (int i = 0; i < lenghti; ++i)
+            {
+                for (int j = 0; j < lenghtj; ++j)
+                {
+                    int newi = 0;
+                    int newj = 0;
+                    int dif = Math.Abs(i - j);
+                    if (i > j)
+                    {                        
+                        newi = i - dif;
+                        newj = j + dif;
+                    }
+                    else if (i < j)
+                    {
+                        newi = i + dif;
+                        newj = j - dif;
+                    }
+                    else
+                    {
+                        newi = i;
+                        newj = j;
+                    }
+                    newMatr.Matr[newi, newj] = matrix.Matr[i, j];
+                }
+            }
+            matrix = newMatr;
+        }
+
         static private void Copy(Matrix[] M1, ref Matrix[] M2, int start = 0)
         {
             int j = 0;
